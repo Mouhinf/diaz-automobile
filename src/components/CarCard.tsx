@@ -24,9 +24,8 @@ export const CarCard = ({ car }: CarCardProps) => {
           <Image
             src={car.imageUrl}
             alt={car.name}
-            layout="fill"
-            objectFit="cover"
-            className="transition-transform duration-300 hover:scale-105"
+            fill // Utilisation de la prop 'fill'
+            className="object-cover transition-transform duration-300 hover:scale-105" // Utilisation de la classe 'object-cover'
           />
         </div>
       </CardHeader>
