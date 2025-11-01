@@ -4,7 +4,9 @@ import "../src/globals.css";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { QueryProvider } from "@/components/QueryProvider"; // Import du nouveau QueryProvider
+import { QueryProvider } from "@/components/QueryProvider";
+import { Header } from "@/components/Header"; // Import du Header
+import { Footer } from "@/components/Footer"; // Import du Footer
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,10 +23,14 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={inter.className}>
-        <QueryProvider> {/* Utilisation du QueryProvider */}
+        <QueryProvider>
           <TooltipProvider>
-            {children}
+            <Header /> {/* Ajout du Header */}
+            <main className="flex-grow"> {/* Ajout d'une balise main pour le contenu principal */}
+              {children}
+            </main>
             <SonnerToaster />
+            <Footer /> {/* Ajout du Footer */}
           </TooltipProvider>
         </QueryProvider>
         <MadeWithDyad />
