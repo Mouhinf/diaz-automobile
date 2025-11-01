@@ -42,12 +42,12 @@ export const CarFilter = ({ onFilterChange }: CarFilterProps) => {
             className="w-full"
           />
         </div>
-        <Select value={brand} onValueChange={setBrand}>
+        <Select value={brand} onValueChange={(value) => setBrand(value === "all" ? "" : value)}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Marque" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toutes les marques</SelectItem>
+            <SelectItem value="all">Toutes les marques</SelectItem> {/* Changed value to "all" */}
             <SelectItem value="Tesla">Tesla</SelectItem>
             <SelectItem value="Renault">Renault</SelectItem>
             <SelectItem value="BMW">BMW</SelectItem>
@@ -74,35 +74,35 @@ export const CarFilter = ({ onFilterChange }: CarFilterProps) => {
           className="w-full"
         />
 
-        <Select value={fuel} onValueChange={setFuel}>
+        <Select value={fuel} onValueChange={(value) => setFuel(value === "all" ? "" : value)}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Carburant" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Tous les carburants</SelectItem>
+            <SelectItem value="all">Tous les carburants</SelectItem> {/* Changed value to "all" */}
             <SelectItem value="Essence">Essence</SelectItem>
             <SelectItem value="Diesel">Diesel</SelectItem>
             <SelectItem value="Électrique">Électrique</SelectItem>
           </SelectContent>
         </Select>
 
-        <Select value={transmission} onValueChange={setTransmission}>
+        <Select value={transmission} onValueChange={(value) => setTransmission(value === "all" ? "" : value)}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Transmission" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toutes les transmissions</SelectItem>
+            <SelectItem value="all">Toutes les transmissions</SelectItem> {/* Changed value to "all" */}
             <SelectItem value="Manuelle">Manuelle</SelectItem>
             <SelectItem value="Automatique">Automatique</SelectItem>
           </SelectContent>
         </Select>
 
-        <Select value={location} onValueChange={setLocation}>
+        <Select value={location} onValueChange={(value) => setLocation(value === "all" ? "" : value)}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Localisation" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toutes les localisations</SelectItem>
+            <SelectItem value="all">Toutes les localisations</SelectItem> {/* Changed value to "all" */}
             <SelectItem value="Dakar">Dakar</SelectItem>
             <SelectItem value="Thiès">Thiès</SelectItem>
             <SelectItem value="Saly">Saly</SelectItem>
