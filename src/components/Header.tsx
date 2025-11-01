@@ -14,8 +14,9 @@ export const Header = () => {
   const navLinks = [
     { href: "/vente", label: "Vente" },
     { href: "/location", label: "Location" },
-    { href: "/about", label: "À propos" }, // Ajout du lien "À propos"
+    { href: "/about", label: "À propos" },
     { href: "/contact", label: "Contact" },
+    { href: "/admin/dashboard", label: "Admin" }, // Ajout du lien Admin
   ];
 
   return (

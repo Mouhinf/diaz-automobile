@@ -1,4 +1,6 @@
-export const featuredCars = [
+import { Car } from './car-management'; // Import the interface from car-management
+
+export const featuredCars: Car[] = [
   {
     id: '1',
     name: 'Tesla Model 3',
@@ -11,6 +13,7 @@ export const featuredCars = [
     location: 'Dakar',
     images: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
     videos: [],
+    status: 'available',
   },
   {
     id: '2',
@@ -24,6 +27,7 @@ export const featuredCars = [
     location: 'Thiès',
     images: ['/placeholder.svg', '/placeholder.svg'],
     videos: [],
+    status: 'available',
   },
   {
     id: '3',
@@ -37,6 +41,7 @@ export const featuredCars = [
     location: 'Dakar',
     images: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
     videos: [],
+    status: 'available',
   },
   {
     id: '4',
@@ -50,6 +55,7 @@ export const featuredCars = [
     location: 'Dakar',
     images: ['/placeholder.svg'],
     videos: [],
+    status: 'available',
   },
   {
     id: '5',
@@ -63,6 +69,7 @@ export const featuredCars = [
     location: 'Saly',
     images: ['/placeholder.svg', '/placeholder.svg'],
     videos: [],
+    status: 'available',
   },
   {
     id: '6',
@@ -76,6 +83,7 @@ export const featuredCars = [
     location: 'Dakar',
     images: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
     videos: [],
+    status: 'available',
   },
   {
     id: '7',
@@ -89,6 +97,7 @@ export const featuredCars = [
     location: 'Dakar',
     images: ['/placeholder.svg', '/placeholder.svg'],
     videos: [],
+    status: 'available',
   },
   {
     id: '8',
@@ -102,5 +111,6 @@ export const featuredCars = [
     location: 'Toubab Dialaw',
     images: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
     videos: [],
+    status: 'available',
   },
 ];
