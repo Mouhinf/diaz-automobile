@@ -26,11 +26,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/location/page.js"
     ],
-    "/vente/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/vente/[id]/page.js"
-    ],
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",

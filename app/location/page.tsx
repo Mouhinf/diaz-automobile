@@ -29,7 +29,7 @@ const LocationPage = () => {
       );
     }
     if (filters.brand) {
-      cars = cars.filter(car => car.name.includes(filters.brand));
+      cars = cars.filter(car => car.brand.toLowerCase().includes(filters.brand.toLowerCase())); // Utilisation du nouveau champ 'brand'
     }
     if (filters.minPrice) {
       cars = cars.filter(car => parseFloat(car.price.replace(/[^0-9,-]+/g, "").replace(',', '.')) >= parseFloat(filters.minPrice));
@@ -72,7 +72,7 @@ const LocationPage = () => {
       {filteredCars.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredCars.map((car) => (
-            <Link key={car.id} href={`/location/${car.id}`}>
+            <Link key={car.id} href={`/vehicles/${car.id}`}> {/* Lien mis à jour */}
               <CarCard car={car} />
             </Link>
           ))}

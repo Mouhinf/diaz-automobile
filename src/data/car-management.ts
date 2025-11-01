@@ -3,6 +3,10 @@ import { featuredCars } from './cars';
 export interface Car {
   id: string;
   name: string;
+  brand: string; // Nouveau champ
+  model: string; // Nouveau champ
+  year: number; // Nouveau champ
+  mileage: string; // Nouveau champ
   price: string;
   description: string;
   imageUrl: string;
@@ -13,9 +17,19 @@ export interface Car {
   images: string[];
   videos: string[];
   status: 'available' | 'sold' | 'rented';
+  features: string[]; // Nouveau champ
 }
 
-export const addCar = (newCar: Omit<Car, 'id' | 'images' | 'videos' | 'status'> & { images?: string[]; videos?: string[]; status?: 'available' | 'sold' | 'rented' }) => {
+export const addCar = (newCar: Omit<Car, 'id' | 'images' | 'videos' | 'status' | 'brand' | 'model' | 'year' | 'mileage' | 'features'> & {
+  images?: string[];
+  videos?: string[];
+  status?: 'available' | 'sold' | 'rented';
+  brand: string;
+  model: string;
+  year: number;
+  mileage: string;
+  features?: string[];
+}) => {
   const id = (featuredCars.length + 1).toString(); // Simple ID generation
   const carToAdd: Car = {
     id,
@@ -23,6 +37,7 @@ export const addCar = (newCar: Omit<Car, 'id' | 'images' | 'videos' | 'status'> 
     images: newCar.images || [],
     videos: newCar.videos || [],
     status: newCar.status || 'available',
+    features: newCar.features || [],
   };
   featuredCars.push(carToAdd);
   return carToAdd;
