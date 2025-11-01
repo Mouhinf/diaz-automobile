@@ -18,10 +18,10 @@ const AdminAddEditCarPage = () => {
 
   const [carData, setCarData] = useState<Omit<Car, 'id'>>({
     name: '',
-    brand: '', // Nouveau champ
-    model: '', // Nouveau champ
-    year: 0,   // Nouveau champ
-    mileage: '', // Nouveau champ
+    brand: '',
+    model: '',
+    year: 0,
+    mileage: '',
     price: '',
     description: '',
     imageUrl: '',
@@ -32,7 +32,7 @@ const AdminAddEditCarPage = () => {
     images: [],
     videos: [],
     status: 'available',
-    features: [], // Nouveau champ
+    features: [],
   });
 
   useEffect(() => {
@@ -63,7 +63,8 @@ const AdminAddEditCarPage = () => {
 
   const handleFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
-    setCarData(prev => ({ ...prev, features: value.split(',').map(s => s.trim()).filter(Boolean) }));
+    // Split by new line or comma, then trim and filter empty strings
+    setCarData(prev => ({ ...prev, features: value.split(/[\n,]/).map(s => s.trim()).filter(Boolean) }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -75,7 +76,7 @@ const AdminAddEditCarPage = () => {
       addCar(carData);
       toast.success('Véhicule ajouté avec succès !');
     }
-    router.push('/admin/cars/manage'); // Rediriger vers la page de gestion après l'opération
+    router.push('/admin/cars/manage');
   };
 
   return (
@@ -125,20 +126,8 @@ const AdminAddEditCarPage = () => {
           <Textarea id="description" value={carData.description} onChange={handleChange} required rows={5} />
         </div>
         <div>
-          <Label htmlFor="imageUrl">URL de l'image principale</Label>
-          <Input id="imageUrl" type="url" value={carData.imageUrl} onChange={handleChange} placeholder="Ex: /placeholder.svg" required />
-        </div>
-        <div>
-          <Label htmlFor="images">URLs des images supplémentaires (séparées par des virgules)</Label>
-          <Input id="images" type="text" value={carData.images.join(', ')} onChange={(e) => handleMediaChange(e, 'images')} placeholder="Ex: /img1.jpg, /img2.jpg" />
-        </div>
-        <div>
-          <Label htmlFor="videos">URLs des vidéos (séparées par des virgules)</Label>
-          <Input id="videos" type="text" value={carData.videos.join(', ')} onChange={(e) => handleMediaChange(e, 'videos')} placeholder="Ex: /video1.mp4, /video2.mp4" />
-        </div>
-        <div>
-          <Label htmlFor="features">Caractéristiques clés (séparées par des virgules)</Label>
-          <Textarea id="features" value={carData.features.join(', ')} onChange={handleFeaturesChange} rows={3} placeholder="Ex: Climatisation, GPS, Sièges en cuir" />
+          <Label htmlFor="features">Caractéristiques clés (une par ligne ou séparées par des virgules)</Label>
+          <Textarea id="features" value={carData.features.join('\n')} onChange={handleFeaturesChange} rows={5} placeholder="Ex: Climatisation&#10;GPS&#10;Sièges en cuir" />
         </div>
         <div>
           <Label htmlFor="fuel">Carburant</Label>
@@ -193,6 +182,18 @@ const AdminAddEditCarPage = () => {
               <SelectItem value="rented">Loué</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div>
+          <Label htmlFor="imageUrl">URL de l'image principale</Label>
+          <Input id="imageUrl" type="url" value={carData.imageUrl} onChange={handleChange} placeholder="Ex: /placeholder.svg" required />
+        </div>
+        <div>
+          <Label htmlFor="images">URLs des images supplémentaires (séparées par des virgules)</Label>
+          <Input id="images" type="text" value={carData.images.join(', ')} onChange={(e) => handleMediaChange(e, 'images')} placeholder="Ex: /img1.jpg, /img2.jpg" />
+        </div>
+        <div>
+          <Label htmlFor="videos">URLs des vidéos (séparées par des virgules)</Label>
+          <Input id="videos" type="text" value={carData.videos.join(', ')} onChange={(e) => handleMediaChange(e, 'videos')} placeholder="Ex: /video1.mp4, /video2.mp4" />
         </div>
         <Button type="submit" className="w-full">
           {isEditing ? 'Modifier le véhicule' : 'Ajouter le véhicule'}
