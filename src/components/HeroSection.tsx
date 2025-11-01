@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link'; // Import de Link pour la navigation
 
 export const HeroSection = () => {
   return (
@@ -15,9 +16,11 @@ export const HeroSection = () => {
           Vente et location de voitures neuves et d'occasion avec un service exceptionnel.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-            Voir nos voitures
-          </Button>
+          <Link href="/vente" passHref> {/* Ajout du Link pour la navigation */}
+            <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+              Nos voitures en vente {/* Texte du bouton modifié */}
+            </Button>
+          </Link>
           <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-black">
             Louer une voiture
           </Button>
