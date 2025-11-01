@@ -16,14 +16,16 @@ export const HeroSection = () => {
           Vente et location de voitures neuves et d'occasion avec un service exceptionnel.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/vente" passHref> {/* Ajout du Link pour la navigation */}
+          <Link href="/vente" passHref>
             <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-              Nos voitures en vente {/* Texte du bouton modifié */}
+              Nos voitures en vente
             </Button>
           </Link>
-          <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-black">
-            Louer une voiture
-          </Button>
+          <Link href="/location" passHref> {/* Ajout du Link pour la navigation vers la page de location */}
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-black">
+              Louer une voiture
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

@@ -1,6 +1,7 @@
 {
   "/page": "app/page.js",
-  "/vente/page": "app/vente/page.js",
   "/vente/add/page": "app/vente/add/page.js",
-  "/vente/[id]/page": "app/vente/[id]/page.js"
+  "/vente/page": "app/vente/page.js",
+  "/vente/[id]/page": "app/vente/[id]/page.js",
+  "/_not-found/page": "app/_not-found/page.js"
 }
