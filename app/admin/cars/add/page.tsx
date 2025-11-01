@@ -18,6 +18,10 @@ const AdminAddEditCarPage = () => {
 
   const [carData, setCarData] = useState<Omit<Car, 'id'>>({
     name: '',
+    brand: '', // Nouveau champ
+    model: '', // Nouveau champ
+    year: 0,   // Nouveau champ
+    mileage: '', // Nouveau champ
     price: '',
     description: '',
     imageUrl: '',
@@ -28,6 +32,7 @@ const AdminAddEditCarPage = () => {
     images: [],
     videos: [],
     status: 'available',
+    features: [], // Nouveau champ
   });
 
   useEffect(() => {
@@ -44,7 +49,7 @@ const AdminAddEditCarPage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
-    setCarData(prev => ({ ...prev, [id]: value }));
+    setCarData(prev => ({ ...prev, [id]: id === 'year' ? parseInt(value) || 0 : value }));
   };
 
   const handleSelectChange = (id: keyof Omit<Car, 'id'>, value: string) => {
@@ -54,6 +59,11 @@ const AdminAddEditCarPage = () => {
   const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>, mediaType: 'images' | 'videos') => {
     const { value } = e.target;
     setCarData(prev => ({ ...prev, [mediaType]: value.split(',').map(s => s.trim()).filter(Boolean) }));
+  };
+
+  const handleFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = e.target;
+    setCarData(prev => ({ ...prev, features: value.split(',').map(s => s.trim()).filter(Boolean) }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -77,6 +87,22 @@ const AdminAddEditCarPage = () => {
         <div>
           <Label htmlFor="name">Nom du véhicule</Label>
           <Input id="name" value={carData.name} onChange={handleChange} required />
+        </div>
+        <div>
+          <Label htmlFor="brand">Marque</Label>
+          <Input id="brand" value={carData.brand} onChange={handleChange} required placeholder="Ex: Tesla" />
+        </div>
+        <div>
+          <Label htmlFor="model">Modèle</Label>
+          <Input id="model" value={carData.model} onChange={handleChange} required placeholder="Ex: Model 3" />
+        </div>
+        <div>
+          <Label htmlFor="year">Année</Label>
+          <Input id="year" type="number" value={carData.year === 0 ? '' : carData.year} onChange={handleChange} required placeholder="Ex: 2022" />
+        </div>
+        <div>
+          <Label htmlFor="mileage">Kilométrage</Label>
+          <Input id="mileage" value={carData.mileage} onChange={handleChange} required placeholder="Ex: 25 000 km" />
         </div>
         <div>
           <Label htmlFor="type">Type d'annonce</Label>
@@ -109,6 +135,10 @@ const AdminAddEditCarPage = () => {
         <div>
           <Label htmlFor="videos">URLs des vidéos (séparées par des virgules)</Label>
           <Input id="videos" type="text" value={carData.videos.join(', ')} onChange={(e) => handleMediaChange(e, 'videos')} placeholder="Ex: /video1.mp4, /video2.mp4" />
+        </div>
+        <div>
+          <Label htmlFor="features">Caractéristiques clés (séparées par des virgules)</Label>
+          <Textarea id="features" value={carData.features.join(', ')} onChange={handleFeaturesChange} rows={3} placeholder="Ex: Climatisation, GPS, Sièges en cuir" />
         </div>
         <div>
           <Label htmlFor="fuel">Carburant</Label>
