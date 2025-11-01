@@ -2,7 +2,7 @@ export const featuredCars = [
   {
     id: '1',
     name: 'Tesla Model 3',
-    price: '45 000 €',
+    price: '29 500 000 FCFA',
     description: 'Électrique, autonomie impressionnante, technologie de pointe.',
     imageUrl: '/placeholder.svg',
     type: 'sale',
@@ -15,7 +15,7 @@ export const featuredCars = [
   {
     id: '2',
     name: 'Renault Clio V',
-    price: '150 €/jour',
+    price: '98 000 FCFA/jour',
     description: 'Compacte, économique, idéale pour la ville.',
     imageUrl: '/placeholder.svg',
     type: 'rent',
@@ -28,7 +28,7 @@ export const featuredCars = [
   {
     id: '3',
     name: 'BMW X5',
-    price: '65 000 €',
+    price: '42 500 000 FCFA',
     description: 'SUV de luxe, puissant et confortable.',
     imageUrl: '/placeholder.svg',
     type: 'sale',
@@ -41,7 +41,7 @@ export const featuredCars = [
   {
     id: '4',
     name: 'Peugeot 208',
-    price: '120 €/jour',
+    price: '78 000 FCFA/jour',
     description: 'Citadine moderne, design élégant et faible consommation.',
     imageUrl: '/placeholder.svg',
     type: 'rent',
@@ -54,7 +54,7 @@ export const featuredCars = [
   {
     id: '5',
     name: 'Mercedes-Benz Classe C',
-    price: '38 000 €',
+    price: '24 800 000 FCFA',
     description: 'Berline élégante, confort et performance.',
     imageUrl: '/placeholder.svg',
     type: 'sale',
@@ -67,7 +67,7 @@ export const featuredCars = [
   {
     id: '6',
     name: 'Volkswagen Golf 8',
-    price: '130 €/jour',
+    price: '85 000 FCFA/jour',
     description: 'Polyvalente, fiable, parfaite pour tous les trajets.',
     imageUrl: '/placeholder.svg',
     type: 'rent',
@@ -80,7 +80,7 @@ export const featuredCars = [
   {
     id: '7',
     name: 'Toyota Corolla',
-    price: '25 000 €',
+    price: '16 300 000 FCFA',
     description: 'Fiable et économique, idéale pour la famille.',
     imageUrl: '/placeholder.svg',
     type: 'sale',
@@ -93,7 +93,7 @@ export const featuredCars = [
   {
     id: '8',
     name: 'Ford Ranger',
-    price: '300 €/jour',
+    price: '195 000 FCFA/jour',
     description: 'Pick-up robuste, parfait pour les terrains difficiles.',
     imageUrl: '/placeholder.svg',
     type: 'rent',

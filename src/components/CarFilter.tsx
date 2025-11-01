@@ -47,7 +47,7 @@ export const CarFilter = ({ onFilterChange }: CarFilterProps) => {
             <SelectValue placeholder="Marque" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Toutes les marques</SelectItem> {/* Changed value to "all" */}
+            <SelectItem value="all">Toutes les marques</SelectItem>
             <SelectItem value="Tesla">Tesla</SelectItem>
             <SelectItem value="Renault">Renault</SelectItem>
             <SelectItem value="BMW">BMW</SelectItem>
@@ -61,14 +61,14 @@ export const CarFilter = ({ onFilterChange }: CarFilterProps) => {
 
         <Input
           type="number"
-          placeholder="Prix min (€)"
+          placeholder="Prix min (FCFA)"
           value={minPrice}
           onChange={(e) => setMinPrice(e.target.value)}
           className="w-full"
         />
         <Input
           type="number"
-          placeholder="Prix max (€)"
+          placeholder="Prix max (FCFA)"
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
           className="w-full"
@@ -79,7 +79,7 @@ export const CarFilter = ({ onFilterChange }: CarFilterProps) => {
             <SelectValue placeholder="Carburant" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tous les carburants</SelectItem> {/* Changed value to "all" */}
+            <SelectItem value="all">Tous les carburants</SelectItem>
             <SelectItem value="Essence">Essence</SelectItem>
             <SelectItem value="Diesel">Diesel</SelectItem>
             <SelectItem value="Électrique">Électrique</SelectItem>
@@ -91,7 +91,7 @@ export const CarFilter = ({ onFilterChange }: CarFilterProps) => {
             <SelectValue placeholder="Transmission" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Toutes les transmissions</SelectItem> {/* Changed value to "all" */}
+            <SelectItem value="all">Toutes les transmissions</SelectItem>
             <SelectItem value="Manuelle">Manuelle</SelectItem>
             <SelectItem value="Automatique">Automatique</SelectItem>
           </SelectContent>
@@ -102,7 +102,7 @@ export const CarFilter = ({ onFilterChange }: CarFilterProps) => {
             <SelectValue placeholder="Localisation" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Toutes les localisations</SelectItem> {/* Changed value to "all" */}
+            <SelectItem value="all">Toutes les localisations</SelectItem>
             <SelectItem value="Dakar">Dakar</SelectItem>
             <SelectItem value="Thiès">Thiès</SelectItem>
             <SelectItem value="Saly">Saly</SelectItem>

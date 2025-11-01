@@ -56,8 +56,8 @@ const AddCarPage = () => {
           <Input id="name" value={carData.name} onChange={handleChange} required />
         </div>
         <div>
-          <Label htmlFor="price">Prix (€)</Label>
-          <Input id="price" type="number" value={carData.price} onChange={handleChange} required />
+          <Label htmlFor="price">Prix (FCFA)</Label>
+          <Input id="price" type="number" value={carData.price} onChange={handleChange} required placeholder="Ex: 15000000" />
         </div>
         <div>
           <Label htmlFor="description">Description</Label>
