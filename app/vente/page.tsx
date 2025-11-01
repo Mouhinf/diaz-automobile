@@ -62,11 +62,12 @@ const VentePage = () => {
 
       <CarFilter onFilterChange={handleFilterChange} />
 
-      <div className="flex justify-end mb-6">
+      {/* Le bouton "Ajouter un véhicule à vendre" est retiré pour les clients */}
+      {/* <div className="flex justify-end mb-6">
         <Link href="/vente/add">
           <Button>Ajouter un véhicule à vendre</Button>
         </Link>
-      </div>
+      </div> */}
 
       {filteredCars.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
