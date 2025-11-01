@@ -1,18 +1,19 @@
-// Update this page (the content is just a fallback if you fail to update the page)
-
 import { MadeWithDyad } from "@/components/made-with-dyad";
+import Layout from "@/components/Layout"; // Import the new Layout component
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">
-          Start building your amazing project here!
+    <Layout>
+      <div className="flex flex-col items-center justify-center py-12">
+        <h1 className="text-4xl font-bold mb-4 text-primary">Welcome to Diaz Automobile</h1>
+        <p className="text-xl text-foreground">
+          Your platform for buying and renting cars in Senegal and West Africa.
+        </p>
+        <p className="text-lg text-muted-foreground mt-2">
+          Start exploring our wide selection of vehicles!
         </p>
       </div>
-      <MadeWithDyad />
-    </div>
+    </Layout>
   );
 };
 
