@@ -25,7 +25,7 @@ export const Footer = () => {
           <ul className="space-y-2">
             <li><Link href="/vente" className="hover:text-white">Voitures à vendre</Link></li>
             <li><Link href="/location" className="hover:text-white">Voitures à louer</Link></li>
-            <li><Link href="/about" className="hover:text-white">À propos</Link></li>
+            <li><Link href="/about" className="hover:text-white">À propos</Link></li> {/* Ajout du lien "À propos" */}
             <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
           </ul>
         </div>
