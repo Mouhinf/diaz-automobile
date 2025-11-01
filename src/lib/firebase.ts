@@ -3,7 +3,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getAnalytics } from "firebase/analytics";
+// getAnalytics est importé dynamiquement ci-dessous pour s'assurer qu'il n'est chargé que côté client
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -21,9 +21,13 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+
 let analytics;
-if (app.name && typeof window !== 'undefined') {
-  analytics = getAnalytics(app);
+// Importe getAnalytics dynamiquement et l'initialise uniquement côté client
+if (typeof window !== 'undefined' && firebaseConfig.measurementId) {
+  import("firebase/analytics").then(({ getAnalytics }) => {
+    analytics = getAnalytics(app);
+  }).catch(e => console.error("Failed to load Firebase Analytics:", e));
 }
 
 export { app, auth, db, storage, analytics };
