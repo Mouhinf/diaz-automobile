@@ -9,6 +9,11 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { addCar, updateCar, getCarById, Car } from '@/data/car-management';
 import { useParams, useRouter } from 'next/navigation';
+import axios from 'axios';
+import { Loader2, XCircle } from 'lucide-react';
+
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
 const AdminAddEditCarPage = () => {
   const router = useRouter();
@@ -35,6 +40,13 @@ const AdminAddEditCarPage = () => {
     features: [],
   });
 
+  // States for file inputs
+  const [mainImageFile, setMainImageFile] = useState<File | null>(null);
+  const [additionalImageFiles, setAdditionalImageFiles] = useState<File[]>([]);
+  const [videoFiles, setVideoFiles] = useState<File[]>([]);
+
+  const [isUploading, setIsUploading] = useState(false);
+
   useEffect(() => {
     if (isEditing) {
       const existingCar = getCarById(carId);
@@ -56,27 +68,102 @@ const AdminAddEditCarPage = () => {
     setCarData(prev => ({ ...prev, [id]: value as any }));
   };
 
-  const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>, mediaType: 'images' | 'videos') => {
-    const { value } = e.target;
-    setCarData(prev => ({ ...prev, [mediaType]: value.split(',').map(s => s.trim()).filter(Boolean) }));
-  };
-
   const handleFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
-    // Split by new line or comma, then trim and filter empty strings
     setCarData(prev => ({ ...prev, features: value.split(/[\n,]/).map(s => s.trim()).filter(Boolean) }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isEditing) {
-      updateCar({ ...carData, id: carId });
-      toast.success('Véhicule modifié avec succès !');
-    } else {
-      addCar(carData);
-      toast.success('Véhicule ajouté avec succès !');
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'mainImage' | 'additionalImages' | 'videos') => {
+    if (!e.target.files) return;
+
+    if (type === 'mainImage') {
+      setMainImageFile(e.target.files[0]);
+    } else if (type === 'additionalImages') {
+      setAdditionalImageFiles(Array.from(e.target.files));
+    } else if (type === 'videos') {
+      setVideoFiles(Array.from(e.target.files));
     }
-    router.push('/admin/cars/manage');
+  };
+
+  const uploadFileToCloudinary = async (file: File, resourceType: 'image' | 'video') => {
+    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+      toast.error("Configuration Cloudinary manquante. Veuillez vérifier vos variables d'environnement.");
+      throw new Error("Cloudinary configuration missing.");
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    formData.append('resource_type', resourceType);
+
+    try {
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`,
+        formData
+      );
+      return response.data.secure_url;
+    } catch (error) {
+      console.error(`Erreur lors du téléversement du ${resourceType} :`, error);
+      toast.error(`Échec du téléversement du ${resourceType} : ${file.name}`);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUploading(true);
+    let newCarData = { ...carData };
+
+    try {
+      // Upload main image if selected
+      if (mainImageFile) {
+        const url = await uploadFileToCloudinary(mainImageFile, 'image');
+        newCarData.imageUrl = url;
+      }
+
+      // Upload additional images if selected
+      if (additionalImageFiles.length > 0) {
+        const urls = await Promise.all(
+          additionalImageFiles.map(file => uploadFileToCloudinary(file, 'image'))
+        );
+        newCarData.images = urls;
+      }
+
+      // Upload videos if selected
+      if (videoFiles.length > 0) {
+        const urls = await Promise.all(
+          videoFiles.map(file => uploadFileToCloudinary(file, 'video'))
+        );
+        newCarData.videos = urls;
+      }
+
+      // Now save car data with new URLs
+      if (isEditing) {
+        updateCar({ ...newCarData, id: carId });
+        toast.success('Véhicule modifié avec succès !');
+      } else {
+        addCar(newCarData);
+        toast.success('Véhicule ajouté avec succès !');
+      }
+      router.push('/admin/cars/manage');
+    } catch (error) {
+      toast.error("Une erreur est survenue lors du téléversement ou de la sauvegarde du véhicule.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeUploadedMedia = (type: 'mainImage' | 'additionalImage' | 'video', urlToRemove?: string) => {
+    if (type === 'mainImage') {
+      setCarData(prev => ({ ...prev, imageUrl: '' }));
+      setMainImageFile(null);
+    } else if (type === 'additionalImage' && urlToRemove) {
+      setCarData(prev => ({ ...prev, images: prev.images.filter(url => url !== urlToRemove) }));
+      setAdditionalImageFiles(prev => prev.filter(file => URL.createObjectURL(file) !== urlToRemove)); // This might not work perfectly if files are already uploaded
+    } else if (type === 'video' && urlToRemove) {
+      setCarData(prev => ({ ...prev, videos: prev.videos.filter(url => url !== urlToRemove) }));
+      setVideoFiles(prev => prev.filter(file => URL.createObjectURL(file) !== urlToRemove)); // Same here
+    }
   };
 
   return (
@@ -183,19 +270,109 @@ const AdminAddEditCarPage = () => {
             </SelectContent>
           </Select>
         </div>
-        <div>
-          <Label htmlFor="imageUrl">URL de l'image principale</Label>
-          <Input id="imageUrl" type="url" value={carData.imageUrl} onChange={handleChange} placeholder="Ex: /placeholder.svg" required />
+
+        {/* File Uploads Section */}
+        <div className="space-y-4 border-t pt-6 mt-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Médias du véhicule</h2>
+
+          {/* Main Image */}
+          <div>
+            <Label htmlFor="mainImage">Image principale</Label>
+            <Input id="mainImage" type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'mainImage')} />
+            {(mainImageFile || carData.imageUrl) && (
+              <div className="relative mt-2 w-32 h-32 rounded-md overflow-hidden">
+                <img
+                  src={mainImageFile ? URL.createObjectURL(mainImageFile) : carData.imageUrl}
+                  alt="Image principale"
+                  className="w-full h-full object-cover"
+                />
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                  onClick={() => removeUploadedMedia('mainImage')}
+                >
+                  <XCircle className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Additional Images */}
+          <div>
+            <Label htmlFor="additionalImages">Images supplémentaires (plusieurs fichiers)</Label>
+            <Input id="additionalImages" type="file" accept="image/*" multiple onChange={(e) => handleFileChange(e, 'additionalImages')} />
+            {(additionalImageFiles.length > 0 || carData.images.length > 0) && (
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {carData.images.map((url, index) => (
+                  <div key={`uploaded-img-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
+                    <img src={url} alt={`Image ${index + 1}`} className="w-full h-full object-cover" />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                      onClick={() => removeUploadedMedia('additionalImage', url)}
+                    >
+                      <XCircle className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                {additionalImageFiles.map((file, index) => (
+                  <div key={`new-img-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
+                    <img src={URL.createObjectURL(file)} alt={`Nouvelle image ${index + 1}`} className="w-full h-full object-cover" />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                      onClick={() => setAdditionalImageFiles(prev => prev.filter(f => f !== file))}
+                    >
+                      <XCircle className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Videos */}
+          <div>
+            <Label htmlFor="videos">Vidéos (plusieurs fichiers)</Label>
+            <Input id="videos" type="file" accept="video/*" multiple onChange={(e) => handleFileChange(e, 'videos')} />
+            {(videoFiles.length > 0 || carData.videos.length > 0) && (
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {carData.videos.map((url, index) => (
+                  <div key={`uploaded-video-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
+                    <video src={url} controls className="w-full h-full object-cover" />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                      onClick={() => removeUploadedMedia('video', url)}
+                    >
+                      <XCircle className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                {videoFiles.map((file, index) => (
+                  <div key={`new-video-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
+                    <video src={URL.createObjectURL(file)} controls className="w-full h-full object-cover" />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                      onClick={() => setVideoFiles(prev => prev.filter(f => f !== file))}
+                    >
+                      <XCircle className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        <div>
-          <Label htmlFor="images">URLs des images supplémentaires (séparées par des virgules)</Label>
-          <Input id="images" type="text" value={carData.images.join(', ')} onChange={(e) => handleMediaChange(e, 'images')} placeholder="Ex: /img1.jpg, /img2.jpg" />
-        </div>
-        <div>
-          <Label htmlFor="videos">URLs des vidéos (séparées par des virgules)</Label>
-          <Input id="videos" type="text" value={carData.videos.join(', ')} onChange={(e) => handleMediaChange(e, 'videos')} placeholder="Ex: /video1.mp4, /video2.mp4" />
-        </div>
-        <Button type="submit" className="w-full">
+
+        <Button type="submit" className="w-full" disabled={isUploading}>
+          {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {isEditing ? 'Modifier le véhicule' : 'Ajouter le véhicule'}
         </Button>
       </form>
