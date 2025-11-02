@@ -22,7 +22,6 @@ const AdminAddEditCarPage = () => {
   const isEditing = !!carId;
 
   const [carData, setCarData] = useState<Omit<Car, 'id'>>({
-    // 'name' field removed as requested
     brand: '',
     model: '',
     year: 0,
@@ -37,8 +36,11 @@ const AdminAddEditCarPage = () => {
     images: [],
     videos: [],
     status: 'available',
-    features: [],
+    features: [], // Les fonctionnalités seront mises à jour lors de la soumission
   });
+
+  // Nouveau state pour le texte brut du champ "Caractéristiques clés"
+  const [featuresInput, setFeaturesInput] = useState<string>('');
 
   // States for file inputs
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
@@ -54,6 +56,8 @@ const AdminAddEditCarPage = () => {
           const existingCar = await getCarById(carId);
           if (existingCar) {
             setCarData(existingCar);
+            // Initialiser featuresInput avec les fonctionnalités existantes, jointes par des retours à la ligne
+            setFeaturesInput(existingCar.features.join('\n'));
           } else {
             toast.error("Véhicule non trouvé pour l'édition.");
             router.push('/admin/cars/manage');
@@ -63,6 +67,9 @@ const AdminAddEditCarPage = () => {
           toast.error("Erreur lors du chargement du véhicule.");
           router.push('/admin/cars/manage');
         }
+      } else {
+        // Réinitialiser featuresInput lors de l'ajout d'une nouvelle voiture
+        setFeaturesInput('');
       }
     };
     fetchCar();
@@ -77,10 +84,9 @@ const AdminAddEditCarPage = () => {
     setCarData(prev => ({ ...prev, [id]: value as any }));
   };
 
-  const handleFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const { value } = e.target;
-    // Split by newlines or commas, trim whitespace, and filter out empty strings
-    setCarData(prev => ({ ...prev, features: value.split(/[\n,]/).map(s => s.trim()).filter(Boolean) }));
+  // Nouveau gestionnaire pour le champ featuresInput
+  const handleFeaturesInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFeaturesInput(e.target.value);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'mainImage' | 'additionalImages' | 'videos') => {
@@ -124,8 +130,11 @@ const AdminAddEditCarPage = () => {
     setIsUploading(true);
     let newCarData = { ...carData };
 
-    // The 'name' field is now derived from brand and model
+    // Le champ 'name' est dérivé de la marque et du modèle
     newCarData.name = `${newCarData.brand} ${newCarData.model}`;
+
+    // Traiter le champ featuresInput ici pour le convertir en tableau de chaînes
+    newCarData.features = featuresInput.split(/[\n,]/).map(s => s.trim()).filter(Boolean);
 
     try {
       // Upload main image if selected
@@ -183,7 +192,6 @@ const AdminAddEditCarPage = () => {
         {isEditing ? 'Modifier le Véhicule' : 'Ajouter un Véhicule'}
       </h1>
       <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-        {/* Le champ 'Nom du véhicule' a été supprimé */}
         <div>
           <Label htmlFor="brand">Marque</Label>
           <Input id="brand" value={carData.brand} onChange={handleChange} required placeholder="Ex: Tesla" />
@@ -222,7 +230,13 @@ const AdminAddEditCarPage = () => {
         </div>
         <div>
           <Label htmlFor="features">Caractéristiques clés (une par ligne ou séparées par des virgules)</Label>
-          <Textarea id="features" value={carData.features.join('\n')} onChange={handleFeaturesChange} rows={5} placeholder="Ex: Climatisation&#10;GPS&#10;Sièges en cuir" />
+          <Textarea
+            id="features"
+            value={featuresInput} // Utilise le nouveau state featuresInput
+            onChange={handleFeaturesInputChange} // Utilise le nouveau gestionnaire
+            rows={5}
+            placeholder="Ex: Climatisation&#10;GPS&#10;Sièges en cuir"
+          />
         </div>
         <div>
           <Label htmlFor="fuel">Carburant</Label>
