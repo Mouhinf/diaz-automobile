@@ -77,7 +77,17 @@ const AdminAddEditCarPage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
-    setCarData(prev => ({ ...prev, [id]: id === 'year' ? parseInt(value) || 0 : value }));
+    setCarData(prev => {
+      const updatedCarData = { ...prev, [id]: id === 'year' ? parseInt(value) || 0 : value };
+
+      // Update the derived 'name' field if brand or model changes
+      if (id === 'brand' || id === 'model') {
+        const brand = id === 'brand' ? value : updatedCarData.brand;
+        const model = id === 'model' ? value : updatedCarData.model;
+        updatedCarData.name = `${brand} ${model}`;
+      }
+      return updatedCarData;
+    });
   };
 
   const handleSelectChange = (id: keyof Omit<Car, 'id'>, value: string) => {
