@@ -1,0 +1,12 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /cars/{carId} {
+      allow read, write: if true; // ATTENTION: Ceci est pour le développement, à sécuriser en production
+    }
+    // Si vous avez d'autres collections, ajoutez des règles pour elles ici
+    match /{document=**} {
+      allow read, write: if false; // Règle par défaut restrictive pour les autres collections
+    }
+  }
+}

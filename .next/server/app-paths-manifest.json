@@ -1,10 +1,5 @@
 {
-  "/location/page": "app/location/page.js",
-  "/vehicles/[id]/page": "app/vehicles/[id]/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/vente/page": "app/vente/page.js",
   "/admin/dashboard/page": "app/admin/dashboard/page.js",
-  "/admin/cars/add/page": "app/admin/cars/add/page.js",
-  "/admin/cars/manage/page": "app/admin/cars/manage/page.js"
+  "/admin/cars/add/page": "app/admin/cars/add/page.js"
 }
