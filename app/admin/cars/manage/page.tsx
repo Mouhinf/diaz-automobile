@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
@@ -10,26 +10,45 @@ import { Edit, Trash2, PlusCircle } from 'lucide-react';
 
 const AdminManageCarsPage = () => {
   const [cars, setCars] = useState<Car[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const fetchCars = () => {
-    setCars(getAllCars());
-  };
+  const fetchCars = useCallback(async () => {
+    setLoading(true);
+    try {
+      const fetchedCars = await getAllCars();
+      setCars(fetchedCars);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des véhicules:", error);
+      toast.error("Erreur lors du chargement des véhicules.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchCars();
-  }, []);
+  }, [fetchCars]);
 
-  const handleDelete = (carId: string) => {
+  const handleDelete = async (carId: string) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce véhicule ?")) {
-      const success = deleteCar(carId);
-      if (success) {
+      try {
+        await deleteCar(carId);
         toast.success('Véhicule supprimé avec succès !');
         fetchCars(); // Re-fetch cars after deletion
-      } else {
+      } catch (error) {
+        console.error("Erreur lors de la suppression du véhicule:", error);
         toast.error('Erreur lors de la suppression du véhicule.');
       }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <p className="text-lg text-gray-600 dark:text-gray-400">Chargement des véhicules...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">

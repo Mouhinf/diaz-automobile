@@ -1,12 +1,13 @@
-import { featuredCars } from './cars';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where } from 'firebase/firestore';
 
 export interface Car {
   id: string;
   name: string;
-  brand: string; // Nouveau champ
-  model: string; // Nouveau champ
-  year: number; // Nouveau champ
-  mileage: string; // Nouveau champ
+  brand: string;
+  model: string;
+  year: number;
+  mileage: string;
   price: string;
   description: string;
   imageUrl: string;
@@ -17,52 +18,74 @@ export interface Car {
   images: string[];
   videos: string[];
   status: 'available' | 'sold' | 'rented';
-  features: string[]; // Nouveau champ
+  features: string[];
 }
 
-export const addCar = (newCar: Omit<Car, 'id' | 'images' | 'videos' | 'status' | 'brand' | 'model' | 'year' | 'mileage' | 'features'> & {
-  images?: string[];
-  videos?: string[];
-  status?: 'available' | 'sold' | 'rented';
-  brand: string;
-  model: string;
-  year: number;
-  mileage: string;
-  features?: string[];
-}) => {
-  const id = (featuredCars.length + 1).toString(); // Simple ID generation
-  const carToAdd: Car = {
-    id,
-    ...newCar,
-    images: newCar.images || [],
-    videos: newCar.videos || [],
-    status: newCar.status || 'available',
-    features: newCar.features || [],
-  };
-  featuredCars.push(carToAdd);
-  return carToAdd;
-};
+const carsCollectionRef = collection(db, 'cars');
 
-export const updateCar = (updatedCar: Car) => {
-  const index = featuredCars.findIndex(car => car.id === updatedCar.id);
-  if (index !== -1) {
-    featuredCars[index] = updatedCar;
-    return featuredCars[index];
+export const addCar = async (newCarData: Omit<Car, 'id'>) => {
+  try {
+    const docRef = await addDoc(carsCollectionRef, newCarData);
+    return { id: docRef.id, ...newCarData };
+  } catch (e) {
+    console.error("Erreur lors de l'ajout du document: ", e);
+    throw e;
   }
-  return null;
 };
 
-export const deleteCar = (carId: string) => {
-  const initialLength = featuredCars.length;
-  const carsAfterDeletion = featuredCars.filter(car => car.id !== carId);
-  featuredCars.splice(0, featuredCars.length, ...carsAfterDeletion); // Update the original array
-  return featuredCars.length < initialLength; // Return true if a car was deleted
+export const updateCar = async (id: string, updatedCarData: Omit<Car, 'id'>) => {
+  try {
+    const carDocRef = doc(db, 'cars', id);
+    await updateDoc(carDocRef, updatedCarData);
+    return { id, ...updatedCarData };
+  } catch (e) {
+    console.error("Erreur lors de la mise à jour du document: ", e);
+    throw e;
+  }
 };
 
-export const getCarById = (id: string) => {
-  return featuredCars.find(car => car.id === id);
+export const deleteCar = async (carId: string) => {
+  try {
+    const carDocRef = doc(db, 'cars', carId);
+    await deleteDoc(carDocRef);
+    return true;
+  } catch (e) {
+    console.error("Erreur lors de la suppression du document: ", e);
+    throw e;
+  }
 };
 
-export const getAllCars = () => {
-  return [...featuredCars]; // Return a copy to prevent direct modification
+export const getCarById = async (id: string) => {
+  try {
+    const carDocRef = doc(db, 'cars', id);
+    const carDoc = await getDoc(carDocRef);
+    if (carDoc.exists()) {
+      return { id: carDoc.id, ...carDoc.data() } as Car;
+    }
+    return null;
+  } catch (e) {
+    console.error("Erreur lors de la récupération du document: ", e);
+    throw e;
+  }
+};
+
+export const getAllCars = async () => {
+  try {
+    const querySnapshot = await getDocs(carsCollectionRef);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Car[];
+  } catch (e) {
+    console.error("Erreur lors de la récupération des documents: ", e);
+    throw e;
+  }
+};
+
+export const getCarsByType = async (type: 'sale' | 'rent') => {
+  try {
+    const q = query(carsCollectionRef, where("type", "==", type));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Car[];
+  } catch (e) {
+    console.error(`Erreur lors de la récupération des voitures de type ${type}: `, e);
+    throw e;
+  }
 };

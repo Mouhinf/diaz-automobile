@@ -48,15 +48,24 @@ const AdminAddEditCarPage = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    if (isEditing) {
-      const existingCar = getCarById(carId);
-      if (existingCar) {
-        setCarData(existingCar);
-      } else {
-        toast.error("Véhicule non trouvé pour l'édition.");
-        router.push('/admin/cars/manage');
+    const fetchCar = async () => {
+      if (isEditing) {
+        try {
+          const existingCar = await getCarById(carId);
+          if (existingCar) {
+            setCarData(existingCar);
+          } else {
+            toast.error("Véhicule non trouvé pour l'édition.");
+            router.push('/admin/cars/manage');
+          }
+        } catch (error) {
+          console.error("Erreur lors du chargement du véhicule:", error);
+          toast.error("Erreur lors du chargement du véhicule.");
+          router.push('/admin/cars/manage');
+        }
       }
-    }
+    };
+    fetchCar();
   }, [carId, isEditing, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -126,7 +135,7 @@ const AdminAddEditCarPage = () => {
         const urls = await Promise.all(
           additionalImageFiles.map(file => uploadFileToCloudinary(file, 'image'))
         );
-        newCarData.images = urls;
+        newCarData.images = [...newCarData.images, ...urls]; // Add new images to existing ones
       }
 
       // Upload videos if selected
@@ -134,15 +143,15 @@ const AdminAddEditCarPage = () => {
         const urls = await Promise.all(
           videoFiles.map(file => uploadFileToCloudinary(file, 'video'))
         );
-        newCarData.videos = urls;
+        newCarData.videos = [...newCarData.videos, ...urls]; // Add new videos to existing ones
       }
 
       // Now save car data with new URLs
       if (isEditing) {
-        updateCar({ ...newCarData, id: carId });
+        await updateCar(carId, newCarData);
         toast.success('Véhicule modifié avec succès !');
       } else {
-        addCar(newCarData);
+        await addCar(newCarData);
         toast.success('Véhicule ajouté avec succès !');
       }
       router.push('/admin/cars/manage');
@@ -159,10 +168,8 @@ const AdminAddEditCarPage = () => {
       setMainImageFile(null);
     } else if (type === 'additionalImage' && urlToRemove) {
       setCarData(prev => ({ ...prev, images: prev.images.filter(url => url !== urlToRemove) }));
-      setAdditionalImageFiles(prev => prev.filter(file => URL.createObjectURL(file) !== urlToRemove)); // This might not work perfectly if files are already uploaded
     } else if (type === 'video' && urlToRemove) {
       setCarData(prev => ({ ...prev, videos: prev.videos.filter(url => url !== urlToRemove) }));
-      setVideoFiles(prev => prev.filter(file => URL.createObjectURL(file) !== urlToRemove)); // Same here
     }
   };
 
@@ -305,7 +312,7 @@ const AdminAddEditCarPage = () => {
             {(additionalImageFiles.length > 0 || carData.images.length > 0) && (
               <div className="mt-2 grid grid-cols-3 gap-2">
                 {carData.images.map((url, index) => (
-                  <div key={`uploaded-img-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
+                  <div key={`uploaded-img-${url}-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
                     <img src={url} alt={`Image ${index + 1}`} className="w-full h-full object-cover" />
                     <Button
                       variant="destructive"
@@ -318,7 +325,7 @@ const AdminAddEditCarPage = () => {
                   </div>
                 ))}
                 {additionalImageFiles.map((file, index) => (
-                  <div key={`new-img-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
+                  <div key={`new-img-${file.name}-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
                     <img src={URL.createObjectURL(file)} alt={`Nouvelle image ${index + 1}`} className="w-full h-full object-cover" />
                     <Button
                       variant="destructive"
@@ -341,7 +348,7 @@ const AdminAddEditCarPage = () => {
             {(videoFiles.length > 0 || carData.videos.length > 0) && (
               <div className="mt-2 grid grid-cols-3 gap-2">
                 {carData.videos.map((url, index) => (
-                  <div key={`uploaded-video-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
+                  <div key={`uploaded-video-${url}-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
                     <video src={url} controls className="w-full h-full object-cover" />
                     <Button
                       variant="destructive"
@@ -354,7 +361,7 @@ const AdminAddEditCarPage = () => {
                   </div>
                 ))}
                 {videoFiles.map((file, index) => (
-                  <div key={`new-video-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
+                  <div key={`new-video-${file.name}-${index}`} className="relative w-32 h-32 rounded-md overflow-hidden">
                     <video src={URL.createObjectURL(file)} controls className="w-full h-full object-cover" />
                     <Button
                       variant="destructive"

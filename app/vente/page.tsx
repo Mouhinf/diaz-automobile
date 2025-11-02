@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CarCard } from '@/components/CarCard';
 import { CarFilter } from '@/components/CarFilter';
-import { featuredCars } from '@/data/cars';
-import { Button } from '@/components/ui/button';
+import { getCarsByType, Car } from '@/data/car-management'; // Import de getCarsByType
 import Link from 'next/link';
 
 const VentePage = () => {
-  const [filteredCars, setFilteredCars] = useState(featuredCars.filter(car => car.type === 'sale'));
+  const [allSaleCars, setAllSaleCars] = useState<Car[]>([]);
+  const [filteredCars, setFilteredCars] = useState<Car[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     search: '',
     brand: '',
@@ -19,23 +20,49 @@ const VentePage = () => {
     location: '',
   });
 
+  const fetchSaleCars = useCallback(async () => {
+    setLoading(true);
+    try {
+      const cars = await getCarsByType('sale');
+      setAllSaleCars(cars);
+      setFilteredCars(cars); // Initialiser les voitures filtrées avec toutes les voitures de vente
+    } catch (error) {
+      console.error("Erreur lors du chargement des voitures à vendre:", error);
+      // Gérer l'erreur
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    let cars = featuredCars.filter(car => car.type === 'sale');
+    fetchSaleCars();
+  }, [fetchSaleCars]);
+
+  useEffect(() => {
+    let cars = [...allSaleCars]; // Travailler sur une copie
 
     if (filters.search) {
       cars = cars.filter(car =>
         car.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-        car.description.toLowerCase().includes(filters.search.toLowerCase())
+        car.description.toLowerCase().includes(filters.search.toLowerCase()) ||
+        car.brand.toLowerCase().includes(filters.search.toLowerCase()) ||
+        car.model.toLowerCase().includes(filters.search.toLowerCase())
       );
     }
     if (filters.brand) {
-      cars = cars.filter(car => car.brand.toLowerCase().includes(filters.brand.toLowerCase())); // Utilisation du nouveau champ 'brand'
+      cars = cars.filter(car => car.brand.toLowerCase() === filters.brand.toLowerCase());
     }
     if (filters.minPrice) {
-      cars = cars.filter(car => parseFloat(car.price.replace(/[^0-9,-]+/g, "").replace(',', '.')) >= parseFloat(filters.minPrice));
+      cars = cars.filter(car => {
+        const priceValue = parseFloat(car.price.replace(/[^0-9,-]+/g, "").replace(',', '.'));
+        return priceValue >= parseFloat(filters.minPrice);
+      });
     }
     if (filters.maxPrice) {
-      cars = cars.filter(car => parseFloat(car.price.replace(/[^0-9,-]+/g, "").replace(',', '.')) <= parseFloat(filters.maxPrice));
+      cars = cars.filter(car => {
+        const priceValue = parseFloat(car.price.replace(/[^0-9,-]+/g, "").replace(',', '.'));
+        return priceValue <= parseFloat(filters.maxPrice);
+      });
     }
     if (filters.fuel) {
       cars = cars.filter(car => car.fuel === filters.fuel);
@@ -48,11 +75,19 @@ const VentePage = () => {
     }
 
     setFilteredCars(cars);
-  }, [filters]);
+  }, [filters, allSaleCars]);
 
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <p className="text-lg text-gray-600 dark:text-gray-400">Chargement des voitures à vendre...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -62,17 +97,10 @@ const VentePage = () => {
 
       <CarFilter onFilterChange={handleFilterChange} />
 
-      {/* Le bouton "Ajouter un véhicule à vendre" est retiré pour les clients */}
-      {/* <div className="flex justify-end mb-6">
-        <Link href="/vente/add">
-          <Button>Ajouter un véhicule à vendre</Button>
-        </Link>
-      </div> */}
-
       {filteredCars.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredCars.map((car) => (
-            <Link key={car.id} href={`/vehicles/${car.id}`}> {/* Lien mis à jour */}
+            <Link key={car.id} href={`/vehicles/${car.id}`}>
               <CarCard car={car} />
             </Link>
           ))}
