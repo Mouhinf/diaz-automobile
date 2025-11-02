@@ -22,7 +22,7 @@ const AdminAddEditCarPage = () => {
   const isEditing = !!carId;
 
   const [carData, setCarData] = useState<Omit<Car, 'id'>>({
-    name: '',
+    // 'name' field removed as requested
     brand: '',
     model: '',
     year: 0,
@@ -79,6 +79,7 @@ const AdminAddEditCarPage = () => {
 
   const handleFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
+    // Split by newlines or commas, trim whitespace, and filter out empty strings
     setCarData(prev => ({ ...prev, features: value.split(/[\n,]/).map(s => s.trim()).filter(Boolean) }));
   };
 
@@ -122,6 +123,9 @@ const AdminAddEditCarPage = () => {
     e.preventDefault();
     setIsUploading(true);
     let newCarData = { ...carData };
+
+    // The 'name' field is now derived from brand and model
+    newCarData.name = `${newCarData.brand} ${newCarData.model}`;
 
     try {
       // Upload main image if selected
@@ -179,10 +183,7 @@ const AdminAddEditCarPage = () => {
         {isEditing ? 'Modifier le Véhicule' : 'Ajouter un Véhicule'}
       </h1>
       <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-        <div>
-          <Label htmlFor="name">Nom du véhicule</Label>
-          <Input id="name" value={carData.name} onChange={handleChange} required />
-        </div>
+        {/* Le champ 'Nom du véhicule' a été supprimé */}
         <div>
           <Label htmlFor="brand">Marque</Label>
           <Input id="brand" value={carData.brand} onChange={handleChange} required placeholder="Ex: Tesla" />
