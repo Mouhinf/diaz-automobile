@@ -1,4 +1,4 @@
-// File: /home/yui/dyad-apps/brave-zebra-dash/app/layout.tsx
+// File: /home/yui/dyad-apps/diaz/app/layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

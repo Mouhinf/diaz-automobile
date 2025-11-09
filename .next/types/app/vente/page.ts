@@ -1,4 +1,4 @@
-// File: /home/yui/dyad-apps/brave-zebra-dash/app/vente/page.tsx
+// File: /home/yui/dyad-apps/diaz/app/vente/page.tsx
 import * as entry from '../../../../app/vente/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

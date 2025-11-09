@@ -1,9 +1,8 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
-// getAnalytics est importé dynamiquement ci-dessous pour s'assurer qu'il n'est chargé que côté client
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
+import { getAuth, Auth } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
+import { getStorage, FirebaseStorage } from "firebase/storage";
+import { Analytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,18 +15,41 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
+let storage: FirebaseStorage | null = null;
+let analytics: Analytics | null = null;
 
-let analytics;
-// Importe getAnalytics dynamiquement et l'initialise uniquement côté client
-if (typeof window !== 'undefined' && firebaseConfig.measurementId) {
-  import("firebase/analytics").then(({ getAnalytics }) => {
-    analytics = getAnalytics(app);
-  }).catch(e => console.error("Failed to load Firebase Analytics:", e));
+// Check if essential Firebase environment variables are present
+const isFirebaseConfigComplete =
+  firebaseConfig.apiKey &&
+  firebaseConfig.authDomain &&
+  firebaseConfig.projectId &&
+  firebaseConfig.storageBucket &&
+  firebaseConfig.appId;
+
+if (!isFirebaseConfigComplete) {
+  console.error(
+    "Firebase configuration is incomplete. Please ensure all NEXT_PUBLIC_FIREBASE_* environment variables are set in your .env.local file."
+  );
+  // The app will continue to run, but Firebase services will not be available.
+  // Components attempting to use `db`, `auth`, etc., will receive `null` and might throw more specific errors.
+} else {
+  // Initialize Firebase only if configuration is complete
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  db = getFirestore(app);
+  storage = getStorage(app);
+
+  // Import getAnalytics dynamically and initialize only on the client side
+  if (typeof window !== 'undefined' && firebaseConfig.measurementId) {
+    import("firebase/analytics").then(({ getAnalytics }) => {
+      if (app) { // Ensure app is initialized before getting analytics
+        analytics = getAnalytics(app);
+      }
+    }).catch(e => console.error("Failed to load Firebase Analytics:", e));
+  }
 }
 
 export { app, auth, db, storage, analytics };
