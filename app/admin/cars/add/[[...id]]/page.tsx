@@ -22,6 +22,22 @@ const AdminAddEditCarPage = () => {
   const carId = Array.isArray(params.id) ? params.id[0] : undefined;
   const isEditing = !!carId;
 
+  // Check for Cloudinary configuration at the top to prevent SSR errors
+  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-2xl text-center">
+        <h1 className="text-4xl font-bold text-red-600 dark:text-red-400 mb-6">Erreur de Configuration</h1>
+        <p className="text-lg text-gray-700 dark:text-gray-300">
+          Les variables d'environnement Cloudinary (NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME et NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET) sont manquantes.
+          Veuillez les définir dans votre fichier .env.local pour utiliser cette fonctionnalité.
+        </p>
+        <Button onClick={() => router.push('/admin/dashboard')} className="mt-6">
+          Retour au Tableau de Bord
+        </Button>
+      </div>
+    );
+  }
+
   const [carData, setCarData] = useState<Omit<Car, 'id'>>({
     brand: '',
     model: '',
@@ -128,6 +144,8 @@ const AdminAddEditCarPage = () => {
   };
 
   const uploadFileToCloudinary = async (file: File, resourceType: 'image' | 'video') => {
+    // This check is now redundant but harmless, as the component will not render if variables are missing.
+    // Keeping it for defensive programming within the function itself.
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
       toast.error("Configuration Cloudinary manquante. Veuillez vérifier vos variables d'environnement.");
       throw new Error("Cloudinary configuration missing.");
